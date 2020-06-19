@@ -36,25 +36,19 @@ function greeting(responses) {
             return;
         } else if (answer == "p") {
             console.log(chalk.black.bgCyan(greetingQuestions.answer.proceed));
-            askQuestions(personalData);
-        } else if (answer !== "p" || answer !== "t") {
-            rl.question(
-                chalkPipe("magenta.bold")(responses.question),
-                (answer) => {
-                    if (answer == "t") {
-                        console.log(
-                            chalk.cyan(greetingQuestions.answer.terminate)
-                        );
-                        rl.close();
-                        return;
-                    } else if (answer == "p") {
-                        console.log(
-                            chalk.black.bgCyan(greetingQuestions.answer.proceed)
-                        );
-                        askQuestions(personalData);
-                    }
+            rl.question(chalk.green(personalData.nameQ), (answer) => {
+                if (answer == "t") {
+                    console.log("GoodBye!");
+                    rl.close();
+                } else if (answer) {
+                    console.log(
+                        chalk.yellow.italic.bold(`\nHello ${answer}\n`)
+                    );
+                    askQuestions(personalData);
                 }
-            );
+            });
+        } else if (answer !== "p" || answer !== "t") {
+            greeting(responses);
         }
     });
 }
@@ -70,13 +64,21 @@ const personalData = {
 };
 
 function askQuestions(answer) {
-    rl.question(chalk.green(personalData.nameQ), (answer) => {
+    rl.question(chalk.green(personalData.ageQ), (answer) => {
+        let parsedAnswer = isNaN(parseInt(answer));
+
         if (answer == "t") {
             console.log("GoodBye!");
             rl.close();
-        } else if (answer) {
-            console.log(chalk.yellow.italic.bold(`\nHello ${answer}\n`));
-            rl.question(chalk.green(personalData.ageQ), (answer) => {
+        } else if (parsedAnswer === true || answer === "") {
+            console.log(
+                chalk.red(
+                    "Sorry, your answer whas invalid. Please enter a valid answer or type 't' to terminate"
+                )
+            );
+            askQuestions(answer);
+        } else if (parsedAnswer === false) {
+            rl.question(chalk.green(personalData.heightQ), (answer) => {
                 let parsedAnswer = isNaN(parseInt(answer));
 
                 if (answer == "t") {
@@ -85,11 +87,13 @@ function askQuestions(answer) {
                 } else if (parsedAnswer === true || answer === "") {
                     console.log(
                         chalk.red(
-                            "Please Enter a Valid Answer or Type 't' to terminate"
+                            "Sorry, your answer whas invalid. Please enter a valid answer or type 't' to terminate"
                         )
                     );
+                    askQuestions(answer);
                 } else if (parsedAnswer === false) {
-                    rl.question(chalk.green(personalData.heightQ), (answer) => {
+                    let heightAnswer = answer;
+                    rl.question(chalk.green(personalData.weightQ), (answer) => {
                         let parsedAnswer = isNaN(parseInt(answer));
 
                         if (answer == "t") {
@@ -98,77 +102,54 @@ function askQuestions(answer) {
                         } else if (parsedAnswer === true || answer === "") {
                             console.log(
                                 chalk.red(
-                                    "Please Enter a Valid Answer or Type 't' to terminate"
+                                    "Sorry, your answer whas invalid. Please enter a valid answer or type 't' to terminate"
                                 )
                             );
+                            askQuestions(answer);
                         } else if (parsedAnswer === false) {
-                            let heightAnswer = answer;
+                            let weightAnswer = answer;
                             rl.question(
-                                chalk.green(personalData.weightQ),
+                                chalk.magenta.bold(personalData.submit),
                                 (answer) => {
-                                    let parsedAnswer = isNaN(parseInt(answer));
-
                                     if (answer == "t") {
                                         console.log("GoodBye!");
                                         rl.close();
-                                    } else if (
-                                        parsedAnswer === true ||
-                                        answer === ""
-                                    ) {
+                                    } else if (answer === "s") {
                                         console.log(
-                                            chalk.red(
-                                                "Please Enter a Valid Answer or Type 't' to terminate"
+                                            chalk.black.bgBlue(
+                                                "\nThe BMI indictaes the following weight status: \n"
                                             )
                                         );
-                                    } else if (parsedAnswer === false) {
-                                        let weightAnswer = answer;
-                                        rl.question(
-                                            chalk.magenta.bold(
-                                                personalData.submit
-                                            ),
-                                            (answer) => {
-                                                if (answer == "t") {
-                                                    console.log("GoodBye!");
-                                                    rl.close();
-                                                } else if (answer === "s") {
-                                                    console.log(
-                                                        chalk.black.bgBlue(
-                                                            "\nThe BMI indictaes the following weight status: \n"
-                                                        )
-                                                    );
-                                                    console.log(
-                                                        chalk.yellow(
-                                                            "- Underweight: BMI Below 18.5"
-                                                        )
-                                                    );
-                                                    console.log(
-                                                        chalk.greenBright(
-                                                            "- Normal: BMI between 18.5 ~ 24.9"
-                                                        )
-                                                    );
-                                                    console.log(
-                                                        chalk.blue(
-                                                            "- Overweight: BMI between 25. ~ 29.9"
-                                                        )
-                                                    );
-                                                    console.log(
-                                                        chalk.red(
-                                                            "- Obese: BMI 30 and above\n"
-                                                        )
-                                                    );
+                                        console.log(
+                                            chalk.yellow(
+                                                "- Underweight: BMI Below 18.5"
+                                            )
+                                        );
+                                        console.log(
+                                            chalk.greenBright(
+                                                "- Normal: BMI between 18.5 ~ 24.9"
+                                            )
+                                        );
+                                        console.log(
+                                            chalk.blue(
+                                                "- Overweight: BMI between 25. ~ 29.9"
+                                            )
+                                        );
+                                        console.log(
+                                            chalk.red(
+                                                "- Obese: BMI 30 and above\n"
+                                            )
+                                        );
 
-                                                    BMIcalculator(
-                                                        weightAnswer,
-                                                        heightAnswer
-                                                    );
-                                                } else {
-                                                    console.log(
-                                                        chalk.magenta.bold(
-                                                            "Please type 's' to see your BMI results or type 't' to terminate"
-                                                        )
-                                                    );
-                                                }
-                                            }
+                                        BMIcalculator(
+                                            weightAnswer,
+                                            heightAnswer
+                                        );
+                                    } else {
+                                        console.log(
+                                            chalk.magenta.bold(
+                                                "Please type 's' to see your BMI results or type 't' to terminate"
+                                            )
                                         );
                                     }
                                 }
